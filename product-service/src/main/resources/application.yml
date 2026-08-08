@@ -7,7 +7,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/product_db?createDatabaseIfNotExist=true
     username: root
-    password: root
+    password: 7978@Rajaman
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -17,6 +17,14 @@ spring:
     redis:
       host: localhost
       port: 6379
+
+jwt:
+  secret: change-this-secret-in-real-deployments-minimum-256-bits-long
+
+cache:
+  ttl:
+    product-minutes: 10
+    product-list-minutes: 5
 
 springdoc:
   swagger-ui:
