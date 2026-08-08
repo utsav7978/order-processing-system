@@ -1,19 +1,20 @@
-┌─────────────────────┐
-                                   │      Clients         │
-                                   │ (Postman / Frontend) │
-                                   └──────────┬───────────┘
-                                              │  HTTP
-                                   ┌──────────▼───────────┐
-                                   │     API Gateway       │
-                                   │ Spring Cloud Gateway  │
-                                   │  + JWT Validation     │
-                                   └──────────┬───────────┘
-                    ┌──────────────┬──────────┼───────────────┬───────────────┐
-                    │              │          │               │               │
-             ┌──────▼─────┐ ┌──────▼─────┐ ┌──▼──────────┐ ┌──▼─────────────┐
-             │ User Service│ │Product Svc │ │Order Service │ │Notification Svc│
-             │  (MySQL)    │ │(MySQL+Redis)│ │(MySQL+Kafka) │ │(Redis+Kafka)   │
-             └─────────────┘ └────────────┘ └──────┬───────┘ └───────▲────────┘
-                                                     │  Kafka Topic     │
-                                                     │  order-events    │
-                                                     └──────────────────┘
+# Architecture
+
+```mermaid
+graph TD
+    A[Clients] --> B[API Gateway]
+    B --> C[User Service]
+    B --> D[Product Service]
+    B --> E[Order Service]
+    B --> F[Notification Service]
+
+    C --> G[(user_db)]
+    D --> H[(product_db)]
+    E --> I[(order_db)]
+
+    E --> J[Kafka Topic: order-events]
+    J --> F
+
+    D --> K[(Redis)]
+    F --> K
+```
