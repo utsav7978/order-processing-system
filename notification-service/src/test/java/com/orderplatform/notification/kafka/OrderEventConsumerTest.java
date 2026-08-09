@@ -61,7 +61,7 @@ class OrderEventConsumerTest {
     }
 
     @Test
-    void handleOrderCreated_marksNotificationFailed_whenSaveThrows() {
+    void handleOrderCreated_letsExceptionPropagate_whenSaveThrows() {
         OrderCreatedEvent event = OrderCreatedEvent.builder()
                 .orderId(2L)
                 .userId(7L)
@@ -69,14 +69,16 @@ class OrderEventConsumerTest {
                 .createdAt(java.time.LocalDateTime.now())
                 .build();
 
-        when(cacheManager.getCache(RedisConfig.NOTIFICATION_CACHE)).thenReturn(cache);
         when(notificationRepository.save(any(Notification.class)))
-                .thenThrow(new RuntimeException("DB down"))
-                .thenReturn(Notification.builder().id(1L).status(NotificationStatus.FAILED).build());
+                .thenThrow(new RuntimeException("DB down"));
 
-        consumer.handleOrderCreated(event);
+        org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class,
+                () -> consumer.handleOrderCreated(event));
 
-        verify(notificationRepository, times(2)).save(any(Notification.class));
-        verify(cache).evict(7L);
+        // Exactly one attempt at this layer - retrying is the container's
+        // job (KafkaConsumerConfig), not this method's.
+        verify(notificationRepository, times(1)).save(any(Notification.class));
+        // Never reached because save() threw before this line.
+        verifyNoInteractions(cacheManager);
     }
 }

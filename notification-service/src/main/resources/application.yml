@@ -19,8 +19,12 @@ spring:
       port: 6379
   kafka:
     bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
       group-id: notification-service-group
+      enable-auto-commit: false
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
@@ -31,6 +35,7 @@ spring:
 kafka:
   topic:
     order-events: order-events
+    order-events-dlt: order-events.dlt
 
 jwt:
   secret: change-this-secret-in-real-deployments-minimum-256-bits-long

@@ -11,6 +11,14 @@ import org.springframework.cache.CacheManager;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * Persistence failures are intentionally NOT caught here - they're left to
+ * propagate so the container-level error handler (see KafkaConsumerConfig)
+ * can retry a bounded number of times and, if it still fails, route the
+ * message to the dead-letter topic instead of this method silently marking
+ * it FAILED and moving on (that was Phase 6's simplification; Phase 8
+ * replaces it with real retry + DLT handling).
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -34,17 +42,14 @@ public class OrderEventConsumer {
                 .status(NotificationStatus.SENT)
                 .build();
 
-        try {
-            // "Pretend to send Email" - a real system would call an email provider here.
-            log.info("Email sent successfully for order {} to user {}", event.getOrderId(), event.getUserId());
-            notificationRepository.save(notification);
-        } catch (Exception ex) {
-            log.error("Failed to process notification for order {}", event.getOrderId(), ex);
-            notification.setStatus(NotificationStatus.FAILED);
-            notificationRepository.save(notification);
-        } finally {
-            evictNotificationCache(event.getUserId());
-        }
+        // "Pretend to send Email" - a real system would call an email provider here.
+        log.info("Email sent successfully for order {} to user {}", event.getOrderId(), event.getUserId());
+
+        // Let this throw on failure - do not catch. The container's
+        // DefaultErrorHandler (KafkaConsumerConfig) owns retry + DLT.
+        notificationRepository.save(notification);
+
+        evictNotificationCache(event.getUserId());
     }
 
     private void evictNotificationCache(Long userId) {
