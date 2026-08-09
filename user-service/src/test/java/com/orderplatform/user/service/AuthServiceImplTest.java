@@ -93,7 +93,7 @@ class AuthServiceImplTest {
         LoginRequest request = new LoginRequest("jane@example.com", "password123");
         when(userRepository.findByEmail("jane@example.com")).thenReturn(Optional.of(existingUser));
         when(passwordEncoder.matches("password123", "encoded-password")).thenReturn(true);
-        when(jwtUtil.generateToken("jane@example.com", "USER")).thenReturn("mock-jwt-token");
+        when(jwtUtil.generateToken("jane@example.com", 1L, "USER")).thenReturn("mock-jwt-token");
         when(userMapper.toJwtResponse(existingUser, "mock-jwt-token")).thenReturn(
                 JwtResponse.builder().token("mock-jwt-token").type("Bearer").email("jane@example.com").role(Role.USER).build());
 
@@ -112,7 +112,7 @@ class AuthServiceImplTest {
         assertThatThrownBy(() -> authService.login(request))
                 .isInstanceOf(InvalidCredentialsException.class);
 
-        verify(jwtUtil, never()).generateToken(anyString(), anyString());
+        verify(jwtUtil, never()).generateToken(anyString(), any(), anyString());
     }
 
     @Test
