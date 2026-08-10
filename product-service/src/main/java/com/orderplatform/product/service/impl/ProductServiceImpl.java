@@ -34,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Cacheable(value = RedisConfig.PRODUCT_CACHE, key = "#id")
+    //@Cacheable(value = RedisConfig.PRODUCT_CACHE, key = "#id")
     public ProductResponse getById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No product found with id: " + id));
