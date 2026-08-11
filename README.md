@@ -348,7 +348,7 @@ Example:
 
 ### Order Creation Screenshot
 
-![Order Created](screenshots/order-created.png)
+![Order Created](screenshots/order_created.png)
 
 ---
 
@@ -571,7 +571,7 @@ All client requests should be made through the API Gateway rather than directly 
 ## Author
 
 **Utsav Kumar Singh**  
-B.Tech Computer Science and Engineering  
+B.Tech Computer Science and Engineering   
 VIT-AP University
 
 - GitHub: [@utsav7978](https://github.com/utsav7978)
